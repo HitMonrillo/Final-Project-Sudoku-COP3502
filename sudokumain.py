@@ -1,7 +1,7 @@
 import pygame
 import random
 import math
-from SudokuGenerator import SudokuGenerator
+from sudoku_generator import *
 
 pygame.init()
 
