@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+from SudokuGenerator import SudokuGenerator
 
 pygame.init()
 
@@ -53,92 +54,6 @@ def game_start(screen):
 
     return button_rect_1, button_rect_2, button_rect_3
 
-class SudokuGenerator:
-    def __init__(self, row_length, removed_cells):
-        self.row_length = row_length
-        self.removed_cells = removed_cells
-        self.box_length = int(math.sqrt(row_length))
-        self.board = [[0] * row_length for _ in range(row_length)]
-
-    def valid_in_row(self, row, num):
-        return num not in self.board[row]
-
-    def valid_in_col(self, col, num):
-        return num not in [self.board[row][col] for row in range(self.row_length)]
-
-    def valid_in_box(self, row_start, col_start, num):
-        for i in range(row_start, row_start + 3):
-            for j in range(col_start, col_start + 3):
-                if self.board[i][j] == num:
-                    return False
-        return True
-
-    def is_valid(self, row, col, num):
-        if not self.valid_in_row(row, num):
-            return False
-        if not self.valid_in_col(col, num):
-            return False
-
-        box_row_start = (row // self.box_length) * self.box_length
-        box_col_start = (col // self.box_length) * self.box_length
-
-        if not self.valid_in_box(box_row_start, box_col_start, num):
-            return False
-
-        return True
-
-    def fill_box(self, row_start, col_start):
-        nums = list(range(1, 10))
-        random.shuffle(nums)
-        count = 0
-        for i in range(row_start, row_start + 3):
-            for j in range(col_start, col_start + 3):
-                self.board[i][j] = nums[count]
-                count += 1
-
-    def fill_diagonal(self):
-        for i in range(0, self.row_length, self.box_length):
-            self.fill_box(i, i)
-
-    def fill_remaining(self, row, col):
-        if col >= self.row_length and row < self.row_length - 1:
-            row += 1
-            col = 0
-        if row >= self.row_length and col >= self.row_length:
-            return True
-        if row < self.box_length:
-            if col < self.box_length:
-                col = self.box_length
-        elif row < self.row_length - self.box_length:
-            if col == int(row // self.box_length * self.box_length):
-                col += self.box_length
-        else:
-            if col == self.row_length - self.box_length:
-                row += 1
-                col = 0
-                if row >= self.row_length:
-                    return True
-
-        for num in range(1, self.row_length + 1):
-            if self.is_valid(row, col, num):
-                self.board[row][col] = num
-                if self.fill_remaining(row, col + 1):
-                    return True
-                self.board[row][col] = 0
-        return False
-
-    def fill_values(self):
-        self.fill_diagonal()
-        self.fill_remaining(0, self.box_length)
-
-    def remove_cells(self):
-        for _ in range(self.removed_cells):
-            row = random.randint(0, self.row_length - 1)
-            col = random.randint(0, self.row_length - 1)
-            self.board[row][col] = 0
-
-    def get_board(self):
-        return self.board
 
 def generate_sudoku(size, removed):
     sudoku = SudokuGenerator(size, removed)
@@ -365,4 +280,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
