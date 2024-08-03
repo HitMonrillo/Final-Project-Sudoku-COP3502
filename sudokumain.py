@@ -6,16 +6,19 @@ from sudoku_generator import SudokuGenerator
 
 pygame.init()
 
+
 def draw_button(surface, color, rect, text, text_color, font):
     pygame.draw.rect(surface, color, rect)
     text_surface = font.render(text, True, text_color)
     text_rect = text_surface.get_rect(center=rect.center)
     surface.blit(text_surface, text_rect)
 
+
 def create_surface(surface, text, font, color, center):
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect(center=center)
     surface.blit(text_surface, text_rect)
+
 
 def game_start(screen):
     BLACK = (0, 0, 0)
@@ -65,56 +68,95 @@ def generate_sudoku(size, removed):
     sudoku.remove_cells()
     return board
 
+
 class Board:
-    def __init__(self, rows, cols, difficulty='easy'):
+    def __init__(self, rows, cols, difficulty="easy"):
         self.rows = rows
         self.cols = cols
         self.cell_size = 600 // rows
         self.board = generate_sudoku(rows, self.get_removed_cells(difficulty))
-        self.fixed_board = [[cell if cell != 0 else None for cell in row] for row in self.board]
+        self.fixed_board = [
+            [cell if cell != 0 else None for cell in row] for row in self.board
+        ]
+        self.board_backup = [row[:] for row in self.board]
+        self.fixed_board_backup = [row[:] for row in self.fixed_board]
         self.selected_cell = None
         self.buttons = {
             "reset": pygame.Rect(650, 50, 120, 50),
             "restart": pygame.Rect(650, 120, 120, 50),
-            "exit": pygame.Rect(650, 190, 120, 50)
+            "exit": pygame.Rect(650, 190, 120, 50),
         }
 
     def draw_buttons(self, screen):
         button_font = pygame.font.Font(None, 35)
-        draw_button(screen, (255, 0, 0), self.buttons["reset"], "Reset", (0, 0, 0), button_font)
-        draw_button(screen, (255, 0, 0), self.buttons["restart"], "Restart", (0, 0, 0), button_font)
-        draw_button(screen, (255, 0, 0), self.buttons["exit"], "Exit", (0, 0, 0), button_font)
+        draw_button(
+            screen, (255, 0, 0), self.buttons["reset"], "Reset", (0, 0, 0), button_font
+        )
+        draw_button(
+            screen,
+            (255, 0, 0),
+            self.buttons["restart"],
+            "Restart",
+            (0, 0, 0),
+            button_font,
+        )
+        draw_button(
+            screen, (255, 0, 0), self.buttons["exit"], "Exit", (0, 0, 0), button_font
+        )
 
     def get_removed_cells(self, difficulty):
-        if difficulty == 'easy':
+        if difficulty == "easy":
             return 30
-        elif difficulty == 'medium':
+        elif difficulty == "medium":
             return 40
-        elif difficulty == 'hard':
+        elif difficulty == "hard":
             return 50
         return 30
 
     def draw(self, screen):
         for i in range(self.rows + 1):
             line_width = 3 if i % 3 == 0 else 1
-            pygame.draw.line(screen, (0, 0, 0), (0, i * self.cell_size), (600, i * self.cell_size), line_width)
-            pygame.draw.line(screen, (0, 0, 0), (i * self.cell_size, 0), (i * self.cell_size, 600), line_width)
+            pygame.draw.line(
+                screen,
+                (0, 0, 0),
+                (0, i * self.cell_size),
+                (600, i * self.cell_size),
+                line_width,
+            )
+            pygame.draw.line(
+                screen,
+                (0, 0, 0),
+                (i * self.cell_size, 0),
+                (i * self.cell_size, 600),
+                line_width,
+            )
 
         for i in range(self.rows):
             for j in range(self.cols):
                 if self.board[i][j] != 0 or self.fixed_board[i][j] is not None:
-                    self.draw_number(screen, self.board[i][j] if self.board[i][j] != 0 else self.fixed_board[i][j], i, j, self.fixed_board[i][j] is not None)
+                    self.draw_number(
+                        screen,
+                        (
+                            self.board[i][j]
+                            if self.board[i][j] != 0
+                            else self.fixed_board[i][j]
+                        ),
+                        i,
+                        j,
+                        self.fixed_board[i][j] is not None,
+                    )
 
         if self.selected_cell:
             self.highlight_selected_cell(screen)
 
         self.draw_buttons(screen)
 
-    def handle_button_click(self, pos):
+    def handle_button_click(self, pos, screen):
         if self.buttons["reset"].collidepoint(pos):
-            self.reset_to_original()
+            self.reset_to_original(screen)
         elif self.buttons["restart"].collidepoint(pos):
-            self.restart_game()
+            self.restart_game(screen)
+            return True
         elif self.buttons["exit"].collidepoint(pos):
             pygame.quit()
             sys.exit()
@@ -126,15 +168,27 @@ class Board:
         screen.blit(text, (col * self.cell_size + 20, row * self.cell_size + 10))
 
     def highlight_selected_cell(self, screen):
-        pygame.draw.rect(screen, (0, 255, 0),
-                         (self.selected_cell[1] * self.cell_size, self.selected_cell[0] * self.cell_size,
-                          self.cell_size, self.cell_size), 3)
+        pygame.draw.rect(
+            screen,
+            (0, 255, 0),
+            (
+                self.selected_cell[1] * self.cell_size,
+                self.selected_cell[0] * self.cell_size,
+                self.cell_size,
+                self.cell_size,
+            ),
+            3,
+        )
 
-    def restart_game(self):
+    def restart_game(self, screen):
         # Restart the game with the same difficulty level
-        self.board = generate_sudoku(self.rows, self.get_removed_cells('easy'))
-        self.fixed_board = [[cell if cell != 0 else None for cell in row] for row in self.board]
-        self.selected_cell = None
+        # self.board = generate_sudoku(self.rows, self.get_removed_cells("easy"))
+        # self.fixed_board = [
+        #     [cell if cell != 0 else None for cell in row] for row in self.board
+        # ]
+        # self.selected_cell = None
+        game_start(screen)
+        return True
 
     def click(self, x, y):
         if x < 600 and y < 600:
@@ -158,9 +212,17 @@ class Board:
             if self.fixed_board[row][col] is None:
                 self.board[row][col] = int(number)
 
-    def reset_to_original(self):
-        self.board = generate_sudoku(self.rows, self.get_removed_cells('easy'))
-        self.fixed_board = [[cell if cell != 0 else None for cell in row] for row in self.board]
+    def reset_to_original(self, screen):
+        self.board = [row[:] for row in self.board_backup]
+        self.fixed_board = [row[:] for row in self.fixed_board_backup]
+        self.selected_cell = None
+
+        screen.fill((255, 255, 255))
+
+        self.draw(screen)
+
+        # Update the display
+        pygame.display.update()
 
     def is_full(self):
         for row in self.board:
@@ -221,14 +283,20 @@ def draw_start_screen(screen):
     text = font.render("Press any key to start", True, (0, 0, 0))
     screen.blit(text, (130, 350))
 
+
 def draw_game_over_screen(screen, game_won):
     font = pygame.font.Font(None, 100)
-    text = font.render("Game Over" if not game_won else "You Win!", True, (255, 0, 0) if not game_won else (0, 255, 0))
+    text = font.render(
+        "Game Over" if not game_won else "You Win!",
+        True,
+        (255, 0, 0) if not game_won else (0, 255, 0),
+    )
     screen.blit(text, (100, 250))
 
     font = pygame.font.Font(None, 50)
     text = font.render("Press ESC to return to menu", True, (0, 0, 0))
     screen.blit(text, (130, 350))
+
 
 def main():
     screen = pygame.display.set_mode((800, 800))
@@ -263,20 +331,29 @@ def main():
                 if game_start_state:
                     mouse_pos = event.pos
                     if button_rect_1.collidepoint(mouse_pos):
-                        board = Board(9, 9, 'easy')
+                        board = Board(9, 9, "easy")
                         game_start_state = False
                     elif button_rect_2.collidepoint(mouse_pos):
-                        board = Board(9, 9, 'medium')
+                        board = Board(9, 9, "medium")
                         game_start_state = False
                     elif button_rect_3.collidepoint(mouse_pos):
-                        board = Board(9, 9, 'hard')
+                        board = Board(9, 9, "hard")
                         game_start_state = False
                 elif not game_over:
                     mouse_pos = event.pos
-                    row, col = board.click(mouse_pos[0], mouse_pos[1])
-                    if row is not None:
+                    if board.click(mouse_pos[0], mouse_pos[1]) is not None:
+                        row, col = board.click(mouse_pos[0], mouse_pos[1])
                         board.select(row, col)
                         board.draw(screen)
+                    else:
+                        if board.handle_button_click(mouse_pos, screen):
+                            screen = pygame.display.set_mode((800, 800))
+                            pygame.display.set_caption("Sudoku")
+                            game_start_state = True
+                            game_over = False
+                            game_won = False
+                            board = None
+
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     if game_over:
@@ -287,12 +364,27 @@ def main():
                         game_start_state = True
                         game_over = False
                         board = None
-                elif event.key in (pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9):
+                elif event.key in (
+                    pygame.K_1,
+                    pygame.K_2,
+                    pygame.K_3,
+                    pygame.K_4,
+                    pygame.K_5,
+                    pygame.K_6,
+                    pygame.K_7,
+                    pygame.K_8,
+                    pygame.K_9,
+                ):
                     board.sketch(event.key - pygame.K_0)
                 elif event.key == pygame.K_RETURN:
-                    board.place_number(board.board[board.selected_cell[0]][board.selected_cell[1]] if board.selected_cell else 0)
+                    board.place_number(
+                        board.board[board.selected_cell[0]][board.selected_cell[1]]
+                        if board.selected_cell
+                        else 0
+                    )
 
         pygame.display.flip()
+
 
 if __name__ == "__main__":
     main()
