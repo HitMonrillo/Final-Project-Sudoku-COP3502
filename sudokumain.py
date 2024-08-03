@@ -173,8 +173,9 @@ def main():
                 if game_start_state:
                     game_start_state = False
                 elif not game_start_state and not game_over:
-                    if event.key == pygame.K_1:
-                        board.sketch(1)
+                    if chr(event.key).isdigit() and chr(event.key) != "0":  # checks if user clicked digit
+                        # sketch the number
+                        board.sketch(chr(event.key))
                     elif event.key == pygame.K_RETURN:
                         if board.selected_cell:
                             board.place_number(board.board[board.selected_cell[0]][board.selected_cell[1]])
