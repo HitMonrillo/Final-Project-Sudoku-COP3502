@@ -1,6 +1,7 @@
 import pygame
 import random
 import math
+import sys
 from sudoku_generator import *
 
 pygame.init()
