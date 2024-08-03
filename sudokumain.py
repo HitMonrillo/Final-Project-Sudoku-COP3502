@@ -276,6 +276,7 @@ def main():
                     row, col = board.click(mouse_pos[0], mouse_pos[1])
                     if row is not None:
                         board.select(row, col)
+                        board.draw(screen)
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     if game_over:
@@ -286,24 +287,8 @@ def main():
                         game_start_state = True
                         game_over = False
                         board = None
-                elif event.key == pygame.K_1:
-                    board.sketch(1)
-                elif event.key == pygame.K_2:
-                    board.sketch(2)
-                elif event.key == pygame.K_3:
-                    board.sketch(3)
-                elif event.key == pygame.K_4:
-                    board.sketch(4)
-                elif event.key == pygame.K_5:
-                    board.sketch(5)
-                elif event.key == pygame.K_6:
-                    board.sketch(6)
-                elif event.key == pygame.K_7:
-                    board.sketch(7)
-                elif event.key == pygame.K_8:
-                    board.sketch(8)
-                elif event.key == pygame.K_9:
-                    board.sketch(9)
+                elif event.key in (pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8, pygame.K_9):
+                    board.sketch(event.key - pygame.K_0)
                 elif event.key == pygame.K_RETURN:
                     board.place_number(board.board[board.selected_cell[0]][board.selected_cell[1]] if board.selected_cell else 0)
 
