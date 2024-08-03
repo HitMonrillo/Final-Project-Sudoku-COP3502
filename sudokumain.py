@@ -380,6 +380,15 @@ def main():
                     elif button_rect_3.collidepoint(mouse_pos):
                         board = Board(9, 9, "hard")
                         game_start_state = False
+                elif game_over:
+                    mouse_pos = event.pos
+                    if pygame.Rect(300, 470,200,50).collidepoint(mouse_pos):
+                        pygame.quit()
+                        sys.exit()
+                    elif pygame.Rect(300, 400,200,50).collidepoint(mouse_pos):
+                        game_over = False
+                        game_start_state = True
+                        board = None
                 elif not game_over:
                     mouse_pos = event.pos
                     if board.click(mouse_pos[0], mouse_pos[1]) is not None:
