@@ -273,6 +273,21 @@ class Board:
                     nums.add(num)
         return True
 
+    def move_selection(self, direction):
+        if self.selected_cell:
+            row, col = self.selected_cell
+            if direction == "UP" and row > 0:
+                row -= 1
+            elif direction == "DOWN" and row < self.rows - 1:
+                row += 1
+            elif direction == "LEFT" and col > 0:
+                col -= 1
+            elif direction == "RIGHT" and col < self.cols - 1:
+                col += 1
+            self.selected_cell = (row, col)
+        else:
+            self.selected_cell = (0, 0)
+
 
 def draw_start_screen(screen):
     font = pygame.font.Font(None, 100)
@@ -294,8 +309,19 @@ def draw_game_over_screen(screen, game_won):
     screen.blit(text, (100, 250))
 
     font = pygame.font.Font(None, 50)
-    text = font.render("Press ESC to return to menu", True, (0, 0, 0))
-    screen.blit(text, (130, 350))
+    restart_text = font.render("Restart" if not game_won else "", True, (0, 0, 0))
+    exit_text = font.render("Exit", True, (0, 0, 0))
+
+    if not game_won:
+        pygame.draw.rect(screen, (255, 0, 0), (300, 400, 200, 50))  # Restart button
+        screen.blit(
+            restart_text,
+            (400 - restart_text.get_width() // 2, 400 + restart_text.get_height() // 2),
+        )
+    pygame.draw.rect(screen, (255, 0, 0), (300, 470, 200, 50))  # Exit button
+    screen.blit(
+        exit_text, (400 - exit_text.get_width() // 2, 470 + exit_text.get_height() // 2)
+    )
 
 
 def main():
