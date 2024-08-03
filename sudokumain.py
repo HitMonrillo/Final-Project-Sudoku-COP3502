@@ -218,7 +218,7 @@ def main():
                 if game_start:
                     game_start = False
                 elif not game_start and not game_over:
-                    if chr(event.key).isdigit():  # checks if user clicekd digit
+                    if chr(event.key).isdigit() and chr(event.key) != "0":  # checks if user clicked digit
                         # sketch the number
                         board.sketch(chr(event.key))
                     elif event.key == pygame.K_RETURN:
