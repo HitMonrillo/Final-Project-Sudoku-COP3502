@@ -288,6 +288,21 @@ class Board:
         else:
             self.selected_cell = (0, 0)
 
+    def move_selection(self, direction):
+        if self.selected_cell:
+            row, col = self.selected_cell
+            if direction == 'UP' and row > 0:
+                row -= 1
+            elif direction == 'DOWN' and row < self.rows - 1:
+                row += 1
+            elif direction == 'LEFT' and col > 0:
+                col -= 1
+            elif direction == 'RIGHT' and col < self.cols - 1:
+                col += 1
+            self.selected_cell = (row, col)
+        else:
+            self.selected_cell = (0, 0)
+
 
 def draw_start_screen(screen):
     font = pygame.font.Font(None, 100)
@@ -390,16 +405,24 @@ def main():
                         game_start_state = True
                         game_over = False
                         board = None
+                elif event.key == pygame.K_UP:
+                    board.move_selection('UP')
+                elif event.key == pygame.K_DOWN:
+                    board.move_selection('DOWN')
+                elif event.key == pygame.K_LEFT:
+                    board.move_selection('LEFT')
+                elif event.key == pygame.K_RIGHT:
+                    board.move_selection('RIGHT')
                 elif event.key in (
-                    pygame.K_1,
-                    pygame.K_2,
-                    pygame.K_3,
-                    pygame.K_4,
-                    pygame.K_5,
-                    pygame.K_6,
-                    pygame.K_7,
-                    pygame.K_8,
-                    pygame.K_9,
+                        pygame.K_1,
+                        pygame.K_2,
+                        pygame.K_3,
+                        pygame.K_4,
+                        pygame.K_5,
+                        pygame.K_6,
+                        pygame.K_7,
+                        pygame.K_8,
+                        pygame.K_9,
                 ):
                     board.sketch(event.key - pygame.K_0)
                 elif event.key == pygame.K_RETURN:
