@@ -89,7 +89,7 @@ class Board:
 
         board = [[0] * 9 for _ in range(9)]
         solve(board)
-        empty_spots = {'easy': 20, 'medium': 40, 'hard': 60}
+        empty_spots = {'easy': 30, 'medium': 40, 'hard': 50}
         spots = random.sample(range(81), empty_spots[difficulty])
         for spot in spots:
             board[spot // 9][spot % 9] = 0
