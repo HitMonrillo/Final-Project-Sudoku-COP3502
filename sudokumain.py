@@ -54,13 +54,46 @@ def game_start(screen):
     return button_rect_1, button_rect_2, button_rect_3
 
 class Board:
-    def __init__(self, rows, cols):
+    def __init__(self, rows, cols, difficulty='easy'):
         self.rows = rows
         self.cols = cols
-        self.board = [[0 for _ in range(cols)] for _ in range(rows)]
+        self.board = self.generate_board(difficulty)
         self.original_board = [row[:] for row in self.board]
         self.cell_size = 600 // rows
         self.selected_cell = None
+
+    def generate_board(self, difficulty):
+        def is_valid(board, row, col, num):
+            for i in range(9):
+                if board[row][i] == num or board[i][col] == num:
+                    return False
+            start_row, start_col = 3 * (row // 3), 3 * (col // 3)
+            for i in range(3):
+                for j in range(3):
+                    if board[start_row + i][start_col + j] == num:
+                        return False
+            return True
+
+        def solve(board):
+            for row in range(9):
+                for col in range(9):
+                    if board[row][col] == 0:
+                        for num in range(1, 10):
+                            if is_valid(board, row, col, num):
+                                board[row][col] = num
+                                if solve(board):
+                                    return True
+                                board[row][col] = 0
+                        return False
+            return True
+
+        board = [[0] * 9 for _ in range(9)]
+        solve(board)
+        empty_spots = {'easy': 20, 'medium': 40, 'hard': 60}
+        spots = random.sample(range(81), empty_spots[difficulty])
+        for spot in spots:
+            board[spot // 9][spot % 9] = 0
+        return board
 
     def draw(self, screen):
         for i in range(self.rows + 1):
@@ -99,15 +132,50 @@ class Board:
     def sketch(self, number):
         if self.selected_cell:
             row, col = self.selected_cell
-            self.board[row][col] = number
+            self.board[row][col] = int(number)
 
     def place_number(self, number):
         if self.selected_cell:
             row, col = self.selected_cell
-            self.board[row][col] = number
+            self.board[row][col] = int(number)
 
     def reset_to_original(self):
         self.board = [row[:] for row in self.original_board]
+
+    def is_full(self):
+        for row in self.board:
+            if 0 in row:
+                return False
+        return True
+
+    def valid_board(self):
+        for row in range(self.rows):
+            if not self.valid_row(row):
+                return False
+        for col in range(self.cols):
+            if not self.valid_col(col):
+                return False
+        for row in range(0, self.rows, 3):
+            for col in range(0, self.cols, 3):
+                if not self.valid_box(row, col):
+                    return False
+        return True
+
+    def valid_row(self, row):
+        row_values = [num for num in self.board[row] if num != 0]
+        return len(row_values) == len(set(row_values))
+
+    def valid_col(self, col):
+        col_values = [self.board[row][col] for row in range(self.rows) if self.board[row][col] != 0]
+        return len(col_values) == len(set(col_values))
+
+    def valid_box(self, start_row, start_col):
+        box_values = []
+        for i in range(3):
+            for j in range(3):
+                if self.board[start_row + i][start_col + j] != 0:
+                    box_values.append(self.board[start_row + i][start_col + j])
+        return len(box_values) == len(set(box_values))
 
 def draw_start_screen(screen):
     font = pygame.font.Font(None, 100)
@@ -144,6 +212,8 @@ def main():
             draw_game_over_screen(screen)
         else:
             board.draw(screen)
+            if board.is_full() and board.valid_board():
+                game_over = True
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -153,17 +223,14 @@ def main():
                 if game_start_state:
                     mouse_pos = event.pos
                     if button_rect_1.collidepoint(mouse_pos):
-                        board = Board(9, 9)
+                        board = Board(9, 9, 'easy')
                         game_start_state = False
-                        print("Easy button clicked")  # Replace with board initialization for easy mode
                     elif button_rect_2.collidepoint(mouse_pos):
-                        board = Board(9, 9)
+                        board = Board(9, 9, 'medium')
                         game_start_state = False
-                        print("Medium button clicked")  # Replace with board initialization for medium mode
                     elif button_rect_3.collidepoint(mouse_pos):
-                        board = Board(9, 9)
+                        board = Board(9, 9, 'hard')
                         game_start_state = False
-                        print("Hard button clicked")  # Replace with board initialization for hard mode
                 elif not game_over:
                     pos = pygame.mouse.get_pos()
                     clicked = board.click(pos[0], pos[1])
@@ -173,8 +240,7 @@ def main():
                 if game_start_state:
                     game_start_state = False
                 elif not game_start_state and not game_over:
-                    if chr(event.key).isdigit() and chr(event.key) != "0":  # checks if user clicked digit
-                        # sketch the number
+                    if chr(event.key).isdigit() and chr(event.key) != "0":
                         board.sketch(chr(event.key))
                     elif event.key == pygame.K_RETURN:
                         if board.selected_cell:
@@ -189,3 +255,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
