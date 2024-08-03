@@ -101,8 +101,20 @@ class Board:
     def draw(self, screen):
         for i in range(self.rows + 1):
             line_width = 3 if i % 3 == 0 else 1
-            pygame.draw.line(screen, (0, 0, 0), (0, i * self.cell_size), (600, i * self.cell_size), line_width)
-            pygame.draw.line(screen, (0, 0, 0), (i * self.cell_size, 0), (i * self.cell_size, 600), line_width)
+            pygame.draw.line(
+                screen,
+                (0, 0, 0),
+                (0, i * self.cell_size),
+                (600, i * self.cell_size),
+                line_width,
+            )
+            pygame.draw.line(
+                screen,
+                (0, 0, 0),
+                (i * self.cell_size, 0),
+                (i * self.cell_size, 600),
+                line_width,
+            )
 
         for i in range(self.rows):
             for j in range(self.cols):
@@ -118,9 +130,17 @@ class Board:
         screen.blit(text, (col * self.cell_size + 20, row * self.cell_size + 10))
 
     def highlight_selected_cell(self, screen):
-        pygame.draw.rect(screen, (0, 255, 0),
-                         (self.selected_cell[1] * self.cell_size, self.selected_cell[0] * self.cell_size,
-                          self.cell_size, self.cell_size), 3)
+        pygame.draw.rect(
+            screen,
+            (0, 255, 0),
+            (
+                self.selected_cell[1] * self.cell_size,
+                self.selected_cell[0] * self.cell_size,
+                self.cell_size,
+                self.cell_size,
+            ),
+            3,
+        )
 
     def click(self, x, y):
         if x < 600 and y < 600:
@@ -198,11 +218,16 @@ def main():
                 if game_start:
                     game_start = False
                 elif not game_start and not game_over:
-                    if event.key == pygame.K_1:
-                        board.sketch(1)
+                    if chr(event.key).isdigit():  # checks if user clicekd digit
+                        # sketch the number
+                        board.sketch(chr(event.key))
                     elif event.key == pygame.K_RETURN:
                         if board.selected_cell:
-                            board.place_number(board.board[board.selected_cell[0]][board.selected_cell[1]])
+                            board.place_number(
+                                board.board[board.selected_cell[0]][
+                                    board.selected_cell[1]
+                                ]
+                            )
                     elif event.key == pygame.K_r:
                         board.reset_to_original()
                     elif event.key == pygame.K_ESCAPE:
@@ -214,4 +239,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
