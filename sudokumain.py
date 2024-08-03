@@ -288,7 +288,7 @@ class Board:
         else:
             self.selected_cell = (0, 0)
 
-    def move_selection(self, direction):
+    def move_arrow(self, direction):
         if self.selected_cell:
             row, col = self.selected_cell
             if direction == 'UP' and row > 0:
@@ -406,13 +406,13 @@ def main():
                         game_over = False
                         board = None
                 elif event.key == pygame.K_UP:
-                    board.move_selection('UP')
+                    board.move_arrow('UP')
                 elif event.key == pygame.K_DOWN:
-                    board.move_selection('DOWN')
+                    board.move_arrow('DOWN')
                 elif event.key == pygame.K_LEFT:
-                    board.move_selection('LEFT')
+                    board.move_arrow('LEFT')
                 elif event.key == pygame.K_RIGHT:
-                    board.move_selection('RIGHT')
+                    board.move_arrow('RIGHT')
                 elif event.key in (
                         pygame.K_1,
                         pygame.K_2,
