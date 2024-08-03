@@ -2,7 +2,7 @@ import pygame
 import random
 import math
 import sys
-from sudoku_generator import *
+from sudoku_generator import SudokuGenerator
 
 pygame.init()
 
@@ -23,6 +23,8 @@ def game_start(screen):
     WIDTH = 800
     HEIGHT = 800
     RED = (255, 0, 0)
+    BUTTON_WIDTH = 120
+    BUTTON_HEIGHT = 50
 
     start_title_font = pygame.font.Font(None, 75)
     game_mode_font = pygame.font.Font(None, 50)
@@ -71,6 +73,17 @@ class Board:
         self.board = generate_sudoku(rows, self.get_removed_cells(difficulty))
         self.fixed_board = [[cell if cell != 0 else None for cell in row] for row in self.board]
         self.selected_cell = None
+        self.buttons = {
+            "reset": pygame.Rect(650, 50, 120, 50),
+            "restart": pygame.Rect(650, 120, 120, 50),
+            "exit": pygame.Rect(650, 190, 120, 50)
+        }
+
+    def draw_buttons(self, screen):
+        button_font = pygame.font.Font(None, 35)
+        draw_button(screen, (255, 0, 0), self.buttons["reset"], "Reset", (0, 0, 0), button_font)
+        draw_button(screen, (255, 0, 0), self.buttons["restart"], "Restart", (0, 0, 0), button_font)
+        draw_button(screen, (255, 0, 0), self.buttons["exit"], "Exit", (0, 0, 0), button_font)
 
     def get_removed_cells(self, difficulty):
         if difficulty == 'easy':
@@ -95,6 +108,17 @@ class Board:
         if self.selected_cell:
             self.highlight_selected_cell(screen)
 
+        self.draw_buttons(screen)
+
+    def handle_button_click(self, pos):
+        if self.buttons["reset"].collidepoint(pos):
+            self.reset_to_original()
+        elif self.buttons["restart"].collidepoint(pos):
+            self.restart_game()
+        elif self.buttons["exit"].collidepoint(pos):
+            pygame.quit()
+            sys.exit()
+
     def draw_number(self, screen, number, row, col, fixed):
         font = pygame.font.Font(None, 60)
         color = (0, 0, 0) if fixed else (0, 0, 255)
@@ -105,6 +129,12 @@ class Board:
         pygame.draw.rect(screen, (0, 255, 0),
                          (self.selected_cell[1] * self.cell_size, self.selected_cell[0] * self.cell_size,
                           self.cell_size, self.cell_size), 3)
+
+    def restart_game(self):
+        # Restart the game with the same difficulty level
+        self.board = generate_sudoku(self.rows, self.get_removed_cells('easy'))
+        self.fixed_board = [[cell if cell != 0 else None for cell in row] for row in self.board]
+        self.selected_cell = None
 
     def click(self, x, y):
         if x < 600 and y < 600:
