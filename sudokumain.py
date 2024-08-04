@@ -47,7 +47,7 @@ def game_start(screen):
         "Welcome To Sudoku",
         start_title_font,
         DARK_BLUE,
-        (WIDTH // 2, HEIGHT // 3 - 150),
+        (WIDTH // 2, HEIGHT // 3 - 100),
     )
     create_surface(
         screen,
@@ -105,19 +105,31 @@ class Board:
 
     def draw_buttons(self, screen):
         button_font = pygame.font.Font(None, 35)
-        draw_button(
-            screen, (255, 0, 0), self.buttons["reset"], "Reset", (0, 0, 0), button_font
-        )
+        BUTTON_COLOR = (255, 69, 0)
+
         draw_button(
             screen,
-            (255, 0, 0),
-            self.buttons["restart"],
-            "Restart",
-            (0, 0, 0),
+            (255, 69, 0),
+            self.buttons["reset"],
+            "Reset",
+            (255, 255, 255),
             button_font,
         )
         draw_button(
-            screen, (255, 0, 0), self.buttons["exit"], "Exit", (0, 0, 0), button_font
+            screen,
+            (255, 69, 0),
+            self.buttons["restart"],
+            "Restart",
+            (255, 255, 255),
+            button_font,
+        )
+        draw_button(
+            screen,
+            (255, 69, 0),
+            self.buttons["exit"],
+            "Exit",
+            (255, 255, 255),
+            button_font,
         )
 
     def get_removed_cells(self, difficulty):
@@ -197,7 +209,7 @@ class Board:
         )
 
     def restart_game(self, screen):
-        #Restart the game with the same difficulty level
+        # Restart the game with the same difficulty level
         self.board = generate_sudoku(self.rows, self.get_removed_cells("easy"))
         self.fixed_board = [
             [cell if cell != 0 else None for cell in row] for row in self.board
@@ -332,26 +344,49 @@ def draw_start_screen(screen):
 
 def draw_game_over_screen(screen, game_won):
     font = pygame.font.Font(None, 100)
-    text = font.render(
-        "Game Over" if not game_won else "You Win!",
-        True,
-        (255, 0, 0) if not game_won else (0, 255, 0),
-    )
-    screen.blit(text, (100, 250))
+    text_color = (255, 69, 0) if not game_won else (30, 144, 255)
+    text = font.render("Game Over" if not game_won else "You Win!", True, text_color)
+    screen.blit(text, (screen.get_width() // 2 - text.get_width() // 2, 250))
 
-    font = pygame.font.Font(None, 50)
-    restart_text = font.render("Restart" if not game_won else "", True, (0, 0, 0))
-    exit_text = font.render("Exit", True, (0, 0, 0))
+    button_font = pygame.font.Font(None, 50)
+    restart_text = button_font.render("Restart", True, (255, 255, 255))
+    exit_text = button_font.render("Exit", True, (255, 255, 255))
+
+    button_color = (255, 69, 0)
+    button_hover_color = (255, 140, 0)
+    button_width = 200
+    button_height = 60
+    button_y_start = 400
 
     if not game_won:
-        pygame.draw.rect(screen, (255, 0, 0), (300, 400, 200, 50))  # Restart button
+        restart_button_rect = pygame.Rect(
+            screen.get_width() // 2 - button_width // 2,
+            button_y_start,
+            button_width,
+            button_height,
+        )
+        pygame.draw.rect(screen, button_color, restart_button_rect, border_radius=10)
         screen.blit(
             restart_text,
-            (400 - restart_text.get_width() // 2, 400 + restart_text.get_height() // 2),
+            (
+                restart_button_rect.centerx - restart_text.get_width() // 2,
+                restart_button_rect.centery - restart_text.get_height() // 2,
+            ),
         )
-    pygame.draw.rect(screen, (255, 0, 0), (300, 470, 200, 50))  # Exit button
+
+    exit_button_rect = pygame.Rect(
+        screen.get_width() // 2 - button_width // 2,
+        button_y_start + 70,
+        button_width,
+        button_height,
+    )
+    pygame.draw.rect(screen, button_color, exit_button_rect, border_radius=10)
     screen.blit(
-        exit_text, (400 - exit_text.get_width() // 2, 470 + exit_text.get_height() // 2)
+        exit_text,
+        (
+            exit_button_rect.centerx - exit_text.get_width() // 2,
+            exit_button_rect.centery - exit_text.get_height() // 2,
+        ),
     )
 
 
