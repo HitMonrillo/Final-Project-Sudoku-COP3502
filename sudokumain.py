@@ -5,8 +5,8 @@ import sys
 from sudoku_generator import SudokuGenerator
 
 pygame.init()
-# gator_img = pygame.image.load("8bit-gator.png")
-# scaled_img = pygame.transform.scale(gator_img, (200, 200))
+gator_img = pygame.image.load("8bit-gator.png")
+scaled_img = pygame.transform.scale(gator_img, (200, 200))
 
 
 def draw_button(surface, color, rect, text, text_color, font):
@@ -184,12 +184,12 @@ class Board:
         )
 
     def restart_game(self, screen):
-        # Restart the game with the same difficulty level
-        # self.board = generate_sudoku(self.rows, self.get_removed_cells("easy"))
-        # self.fixed_board = [
-        #     [cell if cell != 0 else None for cell in row] for row in self.board
-        # ]
-        # self.selected_cell = None
+        Restart the game with the same difficulty level
+        self.board = generate_sudoku(self.rows, self.get_removed_cells("easy"))
+        self.fixed_board = [
+            [cell if cell != 0 else None for cell in row] for row in self.board
+        ]
+        self.selected_cell = None
         game_start(screen)
         return True
 
