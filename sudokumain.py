@@ -5,8 +5,8 @@ import sys
 from sudoku_generator import SudokuGenerator
 
 pygame.init()
-gator_img = pygame.image.load("8bit-gator.png")
-scaled_img = pygame.transform.scale(gator_img, (200, 200))
+# gator_img = pygame.image.load("8bit-gator.png")
+# scaled_img = pygame.transform.scale(gator_img, (200, 200))
 
 
 def draw_button(surface, color, rect, text, text_color, font):
@@ -59,7 +59,7 @@ def game_start(screen):
     draw_button(screen, RED, button_rect_1, "Easy", BLACK, button_font)
     draw_button(screen, RED, button_rect_2, "Medium", BLACK, button_font)
     draw_button(screen, RED, button_rect_3, "Hard", BLACK, button_font)
-    screen.blit(scaled_img, (300, 500))
+    # screen.blit(scaled_img, (300, 500))
 
     return button_rect_1, button_rect_2, button_rect_3
 
@@ -426,16 +426,12 @@ def main():
                 elif event.key == pygame.K_RIGHT:
                     board.move_arrow("RIGHT")
                 elif event.key in (
-                    pygame.K_1,
-                    pygame.K_2,
-                    pygame.K_3,
-                    pygame.K_4,
-                    pygame.K_5,
-                    pygame.K_6,
-                    pygame.K_7,
-                    pygame.K_8,
-                    pygame.K_9,
-                ):
+                    pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8,
+                    pygame.K_9):
+                    board.sketch(event.key - pygame.K_0)
+                elif event.key == pygame.K_RETURN:
+                    board.place_number(
+                        board.board[board.selected_cell[0]][board.selected_cell[1]] if board.selected_cell else 0)
                     board.sketch(event.key - pygame.K_0)
                 elif event.key == pygame.K_RETURN:
                     board.place_number(
