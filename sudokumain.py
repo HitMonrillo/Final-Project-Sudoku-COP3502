@@ -5,6 +5,8 @@ import sys
 from sudoku_generator import SudokuGenerator
 
 pygame.init()
+gator_img = pygame.image.load("8bit-gator.png")
+scaled_img = pygame.transform.scale(gator_img, (200, 200))
 
 
 def draw_button(surface, color, rect, text, text_color, font):
@@ -57,6 +59,7 @@ def game_start(screen):
     draw_button(screen, RED, button_rect_1, "Easy", BLACK, button_font)
     draw_button(screen, RED, button_rect_2, "Medium", BLACK, button_font)
     draw_button(screen, RED, button_rect_3, "Hard", BLACK, button_font)
+    screen.blit(scaled_img, (300, 500))
 
     return button_rect_1, button_rect_2, button_rect_3
 
@@ -291,13 +294,13 @@ class Board:
     def move_arrow(self, direction):
         if self.selected_cell:
             row, col = self.selected_cell
-            if direction == 'UP' and row > 0:
+            if direction == "UP" and row > 0:
                 row -= 1
-            elif direction == 'DOWN' and row < self.rows - 1:
+            elif direction == "DOWN" and row < self.rows - 1:
                 row += 1
-            elif direction == 'LEFT' and col > 0:
+            elif direction == "LEFT" and col > 0:
                 col -= 1
-            elif direction == 'RIGHT' and col < self.cols - 1:
+            elif direction == "RIGHT" and col < self.cols - 1:
                 col += 1
             self.selected_cell = (row, col)
         else:
@@ -382,10 +385,10 @@ def main():
                         game_start_state = False
                 elif game_over:
                     mouse_pos = event.pos
-                    if pygame.Rect(300, 470,200,50).collidepoint(mouse_pos):
+                    if pygame.Rect(300, 470, 200, 50).collidepoint(mouse_pos):
                         pygame.quit()
                         sys.exit()
-                    elif pygame.Rect(300, 400,200,50).collidepoint(mouse_pos):
+                    elif pygame.Rect(300, 400, 200, 50).collidepoint(mouse_pos):
                         game_over = False
                         game_start_state = True
                         board = None
@@ -415,23 +418,23 @@ def main():
                         game_over = False
                         board = None
                 elif event.key == pygame.K_UP:
-                    board.move_arrow('UP')
+                    board.move_arrow("UP")
                 elif event.key == pygame.K_DOWN:
-                    board.move_arrow('DOWN')
+                    board.move_arrow("DOWN")
                 elif event.key == pygame.K_LEFT:
-                    board.move_arrow('LEFT')
+                    board.move_arrow("LEFT")
                 elif event.key == pygame.K_RIGHT:
-                    board.move_arrow('RIGHT')
+                    board.move_arrow("RIGHT")
                 elif event.key in (
-                        pygame.K_1,
-                        pygame.K_2,
-                        pygame.K_3,
-                        pygame.K_4,
-                        pygame.K_5,
-                        pygame.K_6,
-                        pygame.K_7,
-                        pygame.K_8,
-                        pygame.K_9,
+                    pygame.K_1,
+                    pygame.K_2,
+                    pygame.K_3,
+                    pygame.K_4,
+                    pygame.K_5,
+                    pygame.K_6,
+                    pygame.K_7,
+                    pygame.K_8,
+                    pygame.K_9,
                 ):
                     board.sketch(event.key - pygame.K_0)
                 elif event.key == pygame.K_RETURN:
