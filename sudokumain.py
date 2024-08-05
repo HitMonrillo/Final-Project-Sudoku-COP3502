@@ -6,13 +6,13 @@ from sudoku_generator import SudokuGenerator
 
 # Initialize Pygame
 pygame.init()
-gator_img = pygame.image.load("8bit-gator.png")
-scaled_img = pygame.transform.scale(gator_img, (200, 200))
+# gator_img = pygame.image.load("8bit-gator.png")
+# scaled_img = pygame.transform.scale(gator_img, (200, 200))
 
 
 # Function to draw a button with text on a Pygame surface
 def draw_button(surface, color, rect, text, text_color, font):
-    pygame.draw.rect(surface, color, rect, border_radius=10)
+    pygame.draw.rect(surface, color, rect)
     text_surface = font.render(text, True, text_color)
     text_rect = text_surface.get_rect(center=rect.center)
     surface.blit(text_surface, text_rect)
@@ -27,8 +27,6 @@ def create_surface(surface, text, font, color, center):
 
 # Function to initialize and display the game start screen
 def game_start(screen):
-    pygame.init()
-
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     WIDTH = 800
@@ -37,9 +35,9 @@ def game_start(screen):
     BUTTON_WIDTH = 120
     BUTTON_HEIGHT = 50
 
-    start_title_font = pygame.font.Font(None, 100)
-    game_mode_font = pygame.font.Font(None, 60)
-    button_font = pygame.font.Font(None, 40)
+    start_title_font = pygame.font.Font(None, 75)
+    game_mode_font = pygame.font.Font(None, 50)
+    button_font = pygame.font.Font(None, 35)
 
     # Fill the screen with white color
     screen.fill(WHITE)
@@ -427,23 +425,12 @@ def main():
                 elif event.key == pygame.K_RIGHT:
                     board.move_arrow("RIGHT")
                 elif event.key in (
-                    pygame.K_1,
-                    pygame.K_2,
-                    pygame.K_3,
-                    pygame.K_4,
-                    pygame.K_5,
-                    pygame.K_6,
-                    pygame.K_7,
-                    pygame.K_8,
-                    pygame.K_9,
-                ):
+                    pygame.K_1, pygame.K_2, pygame.K_3, pygame.K_4, pygame.K_5, pygame.K_6, pygame.K_7, pygame.K_8,
+                    pygame.K_9):
                     board.sketch(event.key - pygame.K_0)
                 elif event.key == pygame.K_RETURN:
                     board.place_number(
-                        board.board[board.selected_cell[0]][board.selected_cell[1]]
-                        if board.selected_cell
-                        else 0
-                    )
+                        board.board[board.selected_cell[0]][board.selected_cell[1]] if board.selected_cell else 0)
                     board.sketch(event.key - pygame.K_0)
                 elif event.key == pygame.K_RETURN:
                     board.place_number(
