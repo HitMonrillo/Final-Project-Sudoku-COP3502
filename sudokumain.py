@@ -220,12 +220,12 @@ class Board:
 
     # Function to restart the game with the same difficulty level
     def restart_game(self, screen):
-        Restart the game with the same difficulty level
-        self.board = generate_sudoku(self.rows, self.get_removed_cells("easy"))
-        self.fixed_board = [
-            [cell if cell != 0 else None for cell in row] for row in self.board
-        ]
-        self.selected_cell = None
+        # Restart the game with the same difficulty level
+        # self.board = generate_sudoku(self.rows, self.get_removed_cells("easy"))
+        # self.fixed_board = [
+        #     [cell if cell != 0 else None for cell in row] for row in self.board
+        # ]
+        # self.selected_cell = None
         game_start(screen)
         return True
 
