@@ -7,6 +7,7 @@ from sudoku_generator import SudokuGenerator
 pygame.init()
 
 
+# Function for drawing the button for opening menu screen
 def draw_button(surface, color, rect, text, text_color, font):
     pygame.draw.rect(surface, color, rect, border_radius=10)
     text_surface = font.render(text, True, text_color)
@@ -14,12 +15,14 @@ def draw_button(surface, color, rect, text, text_color, font):
     surface.blit(text_surface, text_rect)
 
 
+# Function for creating teh surface for opening menu screen
 def create_surface(surface, text, font, color, center):
     text_surface = font.render(text, True, color)
     text_rect = text_surface.get_rect(center=center)
     surface.blit(text_surface, text_rect)
 
 
+# Function that delivers the opening menu screen visuals on game start
 def game_start(screen):
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
@@ -73,6 +76,7 @@ def game_start(screen):
     return button_rect_1, button_rect_2, button_rect_3
 
 
+# Function that generates sudoku board from SudokuGenerator Class
 def generate_sudoku(size, removed):
     sudoku = SudokuGenerator(size, removed)
     sudoku.fill_values()
@@ -81,6 +85,7 @@ def generate_sudoku(size, removed):
     return board
 
 
+# Class Board Constructor
 class Board:
     def __init__(self, rows, cols, difficulty="easy"):
         self.rows = rows
@@ -99,6 +104,7 @@ class Board:
             "exit": pygame.Rect(650, 190, 120, 50),
         }
 
+    # Draw buttons for the board
     def draw_buttons(self, screen):
         button_font = pygame.font.Font(None, 35)
 
@@ -130,6 +136,7 @@ class Board:
             button_font,
         )
 
+    # Deliver removed num of cells
     def get_removed_cells(self, difficulty):
         if difficulty == "easy":
             return 30
@@ -139,6 +146,7 @@ class Board:
             return 50
         return 30
 
+    # Draw the Sudoku board
     def draw(self, screen):
         for i in range(self.rows + 1):
             line_width = 3 if i % 3 == 0 else 1
@@ -177,6 +185,7 @@ class Board:
 
         self.draw_buttons(screen)
 
+    # Logic for handling in-game buttons - reset, restart, and exit
     def handle_button_click(self, pos, screen):
         if self.buttons["reset"].collidepoint(pos):
             self.reset_to_original(screen)
@@ -187,12 +196,14 @@ class Board:
             pygame.quit()
             sys.exit()
 
+    # Logic for accepting number input from user
     def draw_number(self, screen, number, row, col, fixed):
         font = pygame.font.Font(None, 60)
         color = (0, 0, 0) if fixed else (0, 0, 255)
         text = font.render(str(number), True, color)
         screen.blit(text, (col * self.cell_size + 20, row * self.cell_size + 10))
 
+    # Highlights the cell to create UI showing which cell the user is entering into
     def highlight_selected_cell(self, screen):
         pygame.draw.rect(
             screen,
@@ -206,11 +217,13 @@ class Board:
             3,
         )
 
+    # Logic for restarting the game
     def restart_game(self, screen):
 
         game_start(screen)
         return True
 
+    # Captures relevant click information. Returns none if outside bound of Sudoku board, meaning it was one of the buttons
     def click(self, x, y):
         if x < 600 and y < 600:
             row = y // self.cell_size
@@ -218,21 +231,25 @@ class Board:
             return row, col
         return None
 
+    # Sets the selected cell
     def select(self, row, col):
         self.selected_cell = (row, col)
 
+    # Adds number to the cell
     def sketch(self, number):
         if self.selected_cell:
             row, col = self.selected_cell
             if self.fixed_board[row][col] is None:
                 self.board[row][col] = int(number)
 
+    # Places the users number in
     def place_number(self, number):
         if self.selected_cell:
             row, col = self.selected_cell
             if self.fixed_board[row][col] is None:
                 self.board[row][col] = int(number)
 
+    # Logic for resetting the board, removing current numbers. Utilizing deep copy method
     def reset_to_original(self, screen):
         self.board = [row[:] for row in self.board_backup]
         self.fixed_board = [row[:] for row in self.fixed_board_backup]
@@ -245,12 +262,14 @@ class Board:
         # Update the display
         pygame.display.update()
 
+    # Checks if board is full
     def is_full(self):
         for row in self.board:
             if 0 in row:
                 return False
         return True
 
+    # Check if board is valid
     def valid_board(self):
         for row in range(self.rows):
             if not self.valid_row(row):
@@ -294,21 +313,8 @@ class Board:
                     nums.add(num)
         return True
 
-    def move_selection(self, direction):
-        if self.selected_cell:
-            row, col = self.selected_cell
-            if direction == "UP" and row > 0:
-                row -= 1
-            elif direction == "DOWN" and row < self.rows - 1:
-                row += 1
-            elif direction == "LEFT" and col > 0:
-                col -= 1
-            elif direction == "RIGHT" and col < self.cols - 1:
-                col += 1
-            self.selected_cell = (row, col)
-        else:
-            self.selected_cell = (0, 0)
 
+    #  Captures arrow movement between each cell
     def move_arrow(self, direction):
         if self.selected_cell:
             row, col = self.selected_cell
@@ -325,16 +331,8 @@ class Board:
             self.selected_cell = (0, 0)
 
 
-def draw_start_screen(screen):
-    font = pygame.font.Font(None, 100)
-    text = font.render("Sudoku", True, (0, 0, 0))
-    screen.blit(text, (150, 250))
 
-    font = pygame.font.Font(None, 50)
-    text = font.render("Press any key to start", True, (0, 0, 0))
-    screen.blit(text, (130, 350))
-
-
+# Draws the game when game mode is entered
 def draw_game_over_screen(screen, game_won):
     font = pygame.font.Font(None, 100)
     text_color = (255, 69, 0) if not game_won else (30, 144, 255)
@@ -383,6 +381,7 @@ def draw_game_over_screen(screen, game_won):
     )
 
 
+# Main function instantiating the game logic
 def main():
     screen = pygame.display.set_mode((800, 800))
     pygame.display.set_caption("Sudoku")
