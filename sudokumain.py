@@ -6,20 +6,16 @@ from sudoku_generator import SudokuGenerator
 
 # Initialize Pygame
 pygame.init()
-
-# Load and scale an image to be used in the game
 gator_img = pygame.image.load("8bit-gator.png")
 scaled_img = pygame.transform.scale(gator_img, (200, 200))
 
 
 # Function to draw a button with text on a Pygame surface
 def draw_button(surface, color, rect, text, text_color, font):
-    pygame.draw.rect(surface, color, rect, border_radius=10)  # Draw button rectangle
-    text_surface = font.render(text, True, text_color)  # Render the button text
-    text_rect = text_surface.get_rect(
-        center=rect.center
-    )  # Center the text on the button
-    surface.blit(text_surface, text_rect)  # Draw the text on the surface
+    pygame.draw.rect(surface, color, rect, border_radius=10)
+    text_surface = font.render(text, True, text_color)
+    text_rect = text_surface.get_rect(center=rect.center)
+    surface.blit(text_surface, text_rect)
 
 
 # Function to create a text surface and blit it onto a Pygame surface
@@ -31,21 +27,16 @@ def create_surface(surface, text, font, color, center):
 
 # Function to initialize and display the game start screen
 def game_start(screen):
-    pygame.init()  # Initialize Pygame
+    pygame.init()
 
-    # Define colors
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
-    BLUE = (30, 144, 255)
-    DARK_BLUE = (0, 0, 139)
-    BUTTON_COLOR = (255, 69, 0)
-    BUTTON_HOVER_COLOR = (255, 140, 0)
     WIDTH = 800
     HEIGHT = 800
-    BUTTON_WIDTH = 150
-    BUTTON_HEIGHT = 60
+    RED = (255, 0, 0)
+    BUTTON_WIDTH = 120
+    BUTTON_HEIGHT = 50
 
-    # Define fonts
     start_title_font = pygame.font.Font(None, 100)
     game_mode_font = pygame.font.Font(None, 60)
     button_font = pygame.font.Font(None, 40)
@@ -57,33 +48,25 @@ def game_start(screen):
         screen,
         "Welcome To Sudoku",
         start_title_font,
-        DARK_BLUE,
+        BLACK,
         (WIDTH // 2, HEIGHT // 3 - 150),
     )
     create_surface(
         screen,
         "Select Game Mode:",
         game_mode_font,
-        BLUE,
+        BLACK,
         (WIDTH // 2, HEIGHT // 2 - 100),
     )
 
-    button_rect_1 = pygame.Rect(
-        WIDTH // 4 - BUTTON_WIDTH // 2, HEIGHT // 2, BUTTON_WIDTH, BUTTON_HEIGHT
-    )
-    button_rect_2 = pygame.Rect(
-        WIDTH // 2 - BUTTON_WIDTH // 2, HEIGHT // 2, BUTTON_WIDTH, BUTTON_HEIGHT
-    )
-    button_rect_3 = pygame.Rect(
-        3 * WIDTH // 4 - BUTTON_WIDTH // 2, HEIGHT // 2, BUTTON_WIDTH, BUTTON_HEIGHT
-    )
+    button_rect_1 = pygame.Rect(WIDTH // 3 - 100, HEIGHT // 2, 100, 50)
+    button_rect_2 = pygame.Rect(WIDTH // 2 - 50, HEIGHT // 2, 100, 50)
+    button_rect_3 = pygame.Rect(2 * WIDTH // 3, HEIGHT // 2, 100, 50)
 
-    draw_button(screen, BUTTON_COLOR, button_rect_1, "Easy", WHITE, button_font)
-    draw_button(screen, BUTTON_COLOR, button_rect_2, "Medium", WHITE, button_font)
-    draw_button(screen, BUTTON_COLOR, button_rect_3, "Hard", WHITE, button_font)
-
-    # Load and scale an image if needed (ensure 'scaled_img' is defined and loaded elsewhere in your code)
-    screen.blit(scaled_img, (300, 500))
+    draw_button(screen, RED, button_rect_1, "Easy", BLACK, button_font)
+    draw_button(screen, RED, button_rect_2, "Medium", BLACK, button_font)
+    draw_button(screen, RED, button_rect_3, "Hard", BLACK, button_font)
+    # screen.blit(scaled_img, (300, 500))
 
     return button_rect_1, button_rect_2, button_rect_3
 
@@ -432,31 +415,43 @@ def main():
                     if cell:
                         board.select(cell[0], cell[1])
                     else:
-                        board.handle_button_click(pos, screen)
+                        game_start_state = True
+                        game_over = False
+                        board = None
+                elif event.key == pygame.K_UP:
+                    board.move_arrow("UP")
+                elif event.key == pygame.K_DOWN:
+                    board.move_arrow("DOWN")
+                elif event.key == pygame.K_LEFT:
+                    board.move_arrow("LEFT")
+                elif event.key == pygame.K_RIGHT:
+                    board.move_arrow("RIGHT")
+                elif event.key in (
+                    pygame.K_1,
+                    pygame.K_2,
+                    pygame.K_3,
+                    pygame.K_4,
+                    pygame.K_5,
+                    pygame.K_6,
+                    pygame.K_7,
+                    pygame.K_8,
+                    pygame.K_9,
+                ):
+                    board.sketch(event.key - pygame.K_0)
+                elif event.key == pygame.K_RETURN:
+                    board.place_number(
+                        board.board[board.selected_cell[0]][board.selected_cell[1]]
+                        if board.selected_cell
+                        else 0
+                    )
+                    board.sketch(event.key - pygame.K_0)
+                elif event.key == pygame.K_RETURN:
+                    board.place_number(
+                        board.board[board.selected_cell[0]][board.selected_cell[1]]
+                        if board.selected_cell
+                        else 0
+                    )
 
-            elif event.type == pygame.KEYDOWN and board:
-                if event.key == pygame.K_1:
-                    board.sketch(1)
-                elif event.key == pygame.K_2:
-                    board.sketch(2)
-                elif event.key == pygame.K_3:
-                    board.sketch(3)
-                elif event.key == pygame.K_4:
-                    board.sketch(4)
-                elif event.key == pygame.K_5:
-                    board.sketch(5)
-                elif event.key == pygame.K_6:
-                    board.sketch(6)
-                elif event.key == pygame.K_7:
-                    board.sketch(7)
-                elif event.key == pygame.K_8:
-                    board.sketch(8)
-                elif event.key == pygame.K_9:
-                    board.sketch(9)
-
-        if board:
-            screen.fill((255, 255, 255))
-            board.draw(screen)
         pygame.display.flip()
         clock.tick(60)
 
