@@ -72,12 +72,9 @@ class SudokuGenerator:
 	Return: boolean
     """
 
-    # SUBJECT TO CHANGE ASSUMING YOU ARE USING ZEROBASED INDEXING OR NOT
     def valid_in_row(self, row, num):
         # Iterate thru the row and check if the number is already present
-        check_row = self.board[
-            row
-        ]  # ASSUMING ROW IS ALREADY IN ZEROBASED INDEXING (first row index is 0)
+        check_row = self.board[row]
         for i in range(len(check_row)):
             if check_row[i] == num:
                 return False
@@ -151,7 +148,6 @@ class SudokuGenerator:
             return False
 
         return True
-        # NEED someway to convert relative col, num to access the correct box that it is in given the board length, box length
 
     """
     Fills the specified 3x3 box with values

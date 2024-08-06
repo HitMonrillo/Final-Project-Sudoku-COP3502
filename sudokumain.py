@@ -103,6 +103,7 @@ class Board:
             "restart": pygame.Rect(650, 120, 120, 50),
             "exit": pygame.Rect(650, 190, 120, 50),
         }
+        self.entered_numbers = [[False for col in range(cols)] for row in range(rows)]
 
     # Draw buttons for the board
     def draw_buttons(self, screen):
@@ -199,9 +200,25 @@ class Board:
     # Logic for accepting number input from user
     def draw_number(self, screen, number, row, col, fixed):
         font = pygame.font.Font(None, 60)
-        color = (0, 0, 0) if fixed else (0, 0, 255)
+        if fixed:
+            color = (0, 0, 0)
+        elif self.entered_numbers[row][col]:
+            color = (0, 0, 139)  # Dark blue
+        else:
+            color = (30, 144, 255)  # Light blue
         text = font.render(str(number), True, color)
         screen.blit(text, (col * self.cell_size + 20, row * self.cell_size + 10))
+
+    # Enters the number as dark blue when clicking return
+    def enter_number(self, screen, row, col):
+        if self.selected_cell:
+            row, col = self.selected_cell
+            number = self.board[row][col]
+            if number == 0:
+                return False
+            self.entered_numbers[row][col] = True
+            return True
+        return False
 
     # Highlights the cell to create UI showing which cell the user is entering into
     def highlight_selected_cell(self, screen):
@@ -240,6 +257,8 @@ class Board:
         if self.selected_cell:
             row, col = self.selected_cell
             if self.fixed_board[row][col] is None:
+                if self.board[row][col] != int(number):
+                    self.entered_numbers[row][col] = False
                 self.board[row][col] = int(number)
 
     # Places the users number in
@@ -261,6 +280,18 @@ class Board:
 
         # Update the display
         pygame.display.update()
+
+    # Check if all numbers entered are selected + dark blue
+    def all_numbers_entered(self):
+        for i in range(self.rows):
+            for j in range(self.cols):
+                if (
+                    self.board[i][j] != 0
+                    and not self.entered_numbers[i][j]
+                    and self.fixed_board[i][j] is None
+                ):
+                    return False
+        return True
 
     # Checks if board is full
     def is_full(self):
@@ -313,7 +344,6 @@ class Board:
                     nums.add(num)
         return True
 
-
     #  Captures arrow movement between each cell
     def move_arrow(self, direction):
         if self.selected_cell:
@@ -329,7 +359,6 @@ class Board:
             self.selected_cell = (row, col)
         else:
             self.selected_cell = (0, 0)
-
 
 
 # Draws the game when game mode is entered
@@ -400,7 +429,7 @@ def main():
             draw_game_over_screen(screen, game_won)
         else:
             board.draw(screen)
-            if board.is_full():
+            if board.is_full() and board.all_numbers_entered():
                 if board.valid_board():
                     game_won = True
                 else:
@@ -477,19 +506,10 @@ def main():
                     pygame.K_9,
                 ):
                     board.sketch(event.key - pygame.K_0)
+
                 elif event.key == pygame.K_RETURN:
-                    board.place_number(
-                        board.board[board.selected_cell[0]][board.selected_cell[1]]
-                        if board.selected_cell
-                        else 0
-                    )
-                    board.sketch(event.key - pygame.K_0)
-                elif event.key == pygame.K_RETURN:
-                    board.place_number(
-                        board.board[board.selected_cell[0]][board.selected_cell[1]]
-                        if board.selected_cell
-                        else 0
-                    )
+                    if board.enter_number(screen, row, col):
+                        pygame.display.flip()
 
         pygame.display.flip()
 
